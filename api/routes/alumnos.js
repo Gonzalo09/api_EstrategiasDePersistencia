@@ -3,7 +3,9 @@ var router = express.Router();
 var models = require("../models");
 
 router.get("/", (req, res) => {
-  console.log("Esto es un mensaje para ver en consola");
+  const page = parseInt(req.query.page);
+  const limit = parseInt(req.query.limit);
+
   models.alumno
     .findAll({
       attributes: ["id", "nombre", "id_carrera"],
@@ -14,6 +16,8 @@ router.get("/", (req, res) => {
           attributes: ["id", "nombre"],
         },
       ],
+      offset: (page - 1) * limit,
+      limit: limit,
     })
     .then((alumnos) => res.send(alumnos))
     .catch(() => res.sendStatus(500));
