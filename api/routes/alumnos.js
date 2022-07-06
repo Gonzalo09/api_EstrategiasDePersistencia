@@ -43,6 +43,13 @@ const findAlumno = (id, { onSuccess, onNotFound, onError }) => {
   models.alumno
     .findOne({
       attributes: ["id", "nombre", "id_carrera"],
+      include: [
+        {
+          as: "Carrera-Relacionada",
+          model: models.carrera,
+          attributes: ["id", "nombre"],
+        },
+      ],
       where: { id },
     })
     .then((alumno) => (alumno ? onSuccess(alumno) : onNotFound()))
@@ -60,8 +67,10 @@ router.get("/:id", (req, res) => {
 router.put("/:id", (req, res) => {
   const onSuccess = (alumno) =>
     alumno
-      .update({ nombre: req.body.nombre }, { fields: ["nombre"] })
-      .update({ id_carrera: req.body.id_carrera }, { fields: ["id_carrera"] })
+      .update(
+        { nombre: req.body.nombre, id_carrera: req.body.id_carrera },
+        { fields: ["nombre", "id_carrera"] }
+      )
       .then(() => res.sendStatus(200))
       .catch((error) => {
         if (error == "SequelizeUniqueConstraintError: Validation error") {
