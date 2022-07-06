@@ -8,7 +8,14 @@ router.get("/", (req, res) => {
 
   models.carrera
     .findAll({
-      attributes: ["id", "nombre"],
+      attributes: ["id", "nombre", "id_instituto"],
+      include: [
+        {
+          as: "Instituto-Relacionado",
+          model: models.instituto,
+          attributes: ["id", "nombre"],
+        },
+      ],
       offset: (page - 1) * limit,
       limit: limit,
     })
@@ -18,7 +25,7 @@ router.get("/", (req, res) => {
 
 router.post("/", (req, res) => {
   models.carrera
-    .create({ nombre: req.body.nombre })
+    .create({ nombre: req.body.nombre, id_instituto: req.body.id_instituto })
     .then((carrera) => res.status(201).send({ id: carrera.id }))
     .catch((error) => {
       if (error == "SequelizeUniqueConstraintError: Validation error") {
@@ -35,7 +42,7 @@ router.post("/", (req, res) => {
 const findCarrera = (id, { onSuccess, onNotFound, onError }) => {
   models.carrera
     .findOne({
-      attributes: ["id", "nombre"],
+      attributes: ["id", "nombre", "id_instituto"],
       where: { id },
     })
     .then((carrera) => (carrera ? onSuccess(carrera) : onNotFound()))
@@ -54,6 +61,10 @@ router.put("/:id", (req, res) => {
   const onSuccess = (carrera) =>
     carrera
       .update({ nombre: req.body.nombre }, { fields: ["nombre"] })
+      .update(
+        { id_instituto: req.body.id_instituto },
+        { fields: ["id_instituto"] }
+      )
       .then(() => res.sendStatus(200))
       .catch((error) => {
         if (error == "SequelizeUniqueConstraintError: Validation error") {

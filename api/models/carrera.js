@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     "carrera",
     {
       nombre: DataTypes.STRING,
+      id_instituto: DataTypes.INTEGER,
     },
     {}
   );
@@ -11,7 +12,11 @@ module.exports = (sequelize, DataTypes) => {
   carrera.associate = function (models) {
     carrera.hasMany(models.materia, {
       as: "Materia",
-      foreignKey: "id_carrera",
+      primaryKey: "id",
+    });
+    carrera.belongsTo(models.instituto, {
+      as: "Instituto-Relacionado",
+      foreignKey: "id_instituto",
     });
   };
 
