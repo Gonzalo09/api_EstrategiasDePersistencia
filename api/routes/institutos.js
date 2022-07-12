@@ -1,8 +1,9 @@
 var express = require("express");
 var router = express.Router();
 var models = require("../models");
+var validador = require("./validador");
 
-router.get("/", (req, res) => {
+router.get("/", validador.validateToken, (req, res) => {
   const page = parseInt(req.query.page);
   const limit = parseInt(req.query.limit);
 
@@ -16,7 +17,7 @@ router.get("/", (req, res) => {
     .catch(() => res.sendStatus(500));
 });
 
-router.post("/", (req, res) => {
+router.post("/", validador.validateToken, (req, res) => {
   models.instituto
     .create({ nombre: req.body.nombre })
     .then((instituto) => res.status(201).send({ id: instituto.id }))
@@ -42,7 +43,7 @@ const findinstituto = (id, { onSuccess, onNotFound, onError }) => {
     .catch(() => onError());
 };
 
-router.get("/:id", (req, res) => {
+router.get("/:id", validador.validateToken, (req, res) => {
   findinstituto(req.params.id, {
     onSuccess: (instituto) => res.send(instituto),
     onNotFound: () => res.sendStatus(404),
@@ -50,7 +51,7 @@ router.get("/:id", (req, res) => {
   });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validador.validateToken, (req, res) => {
   const onSuccess = (instituto) =>
     instituto
       .update({ nombre: req.body.nombre }, { fields: ["nombre"] })
@@ -74,7 +75,7 @@ router.put("/:id", (req, res) => {
   });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validador.validateToken, (req, res) => {
   const onSuccess = (instituto) =>
     instituto
       .destroy()

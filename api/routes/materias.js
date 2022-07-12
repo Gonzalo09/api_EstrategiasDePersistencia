@@ -1,8 +1,9 @@
 var express = require("express");
 var router = express.Router();
 var models = require("../models");
+var validador = require("./validador");
 
-router.get("/", (req, res) => {
+router.get("/", validador.validateToken, (req, res) => {
   const page = parseInt(req.query.page);
   const limit = parseInt(req.query.limit);
 
@@ -23,7 +24,7 @@ router.get("/", (req, res) => {
     .catch(() => res.sendStatus(500));
 });
 
-router.post("/", (req, res) => {
+router.post("/", validador.validateToken, (req, res) => {
   models.materia
     .create({ nombre: req.body.nombre, id_carrera: req.body.id_carrera })
     .then((materia) => res.status(201).send({ id: materia.id }))
@@ -49,7 +50,7 @@ const findmateria = (id, { onSuccess, onNotFound, onError }) => {
     .catch(() => onError());
 };
 
-router.get("/:id", (req, res) => {
+router.get("/:id", validador.validateToken, (req, res) => {
   findmateria(req.params.id, {
     onSuccess: (materia) => res.send(materia),
     onNotFound: () => res.sendStatus(404),
@@ -57,7 +58,7 @@ router.get("/:id", (req, res) => {
   });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validador.validateToken, (req, res) => {
   const onSuccess = (materia) =>
     materia
       .update({ nombre: req.body.nombre }, { fields: ["nombre"] })
@@ -82,7 +83,7 @@ router.put("/:id", (req, res) => {
   });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validador.validateToken, (req, res) => {
   const onSuccess = (materia) =>
     materia
       .destroy()

@@ -1,8 +1,9 @@
 var express = require("express");
 var router = express.Router();
 var models = require("../models");
+var validador = require("./validador");
 
-router.get("/", (req, res) => {
+router.get("/", validador.validateToken, (req, res) => {
   const page = parseInt(req.query.page);
   const limit = parseInt(req.query.limit);
 
@@ -23,7 +24,7 @@ router.get("/", (req, res) => {
     .catch(() => res.sendStatus(500));
 });
 
-router.post("/", (req, res) => {
+router.post("/", validador.validateToken, (req, res) => {
   models.alumno
     .create({ nombre: req.body.nombre, id_carrera: req.body.id_carrera })
     .then((alumno) => res.status(201).send({ id: alumno.id }))
@@ -56,7 +57,7 @@ const findAlumno = (id, { onSuccess, onNotFound, onError }) => {
     .catch(() => onError());
 };
 
-router.get("/:id", (req, res) => {
+router.get("/:id", validador.validateToken, (req, res) => {
   findAlumno(req.params.id, {
     onSuccess: (alumno) => res.send(alumno),
     onNotFound: () => res.sendStatus(404),
@@ -64,7 +65,7 @@ router.get("/:id", (req, res) => {
   });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validador.validateToken, (req, res) => {
   const onSuccess = (alumno) =>
     alumno
       .update(
@@ -91,7 +92,7 @@ router.put("/:id", (req, res) => {
   });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validador.validateToken, (req, res) => {
   const onSuccess = (alumno) =>
     alumno
       .destroy()
