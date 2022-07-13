@@ -21,6 +21,17 @@ router.get("/", (req, res) => {
     .catch(() => res.sendStatus(500));
 });
 
+router.delete("/:usuario", (req, res) => {
+  models.usuario
+    .destroy({
+      where: {
+        usuario: req.params.usuario,
+      },
+    })
+    .then(() => res.sendStatus(200))
+    .catch(() => res.sendStatus(500));
+});
+
 // Crear un usuario
 router.post("/signup", (req, res) => {
   let password = bcrypt.hashSync(req.body.password, 10);
